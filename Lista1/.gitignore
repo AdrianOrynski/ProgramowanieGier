@@ -1,7 +1,6 @@
 # Wyniki kompilacji
-/bin/
-/bin-int/
-/obj/
+/build/
+/build-int/
 
 # Pliki generowane przez premake5 / Visual Studio
 .vs/
