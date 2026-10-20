@@ -10,6 +10,9 @@ workspace "ProgramowanieGier"
     includedirs { "vendor/include", "." }
     libdirs { "vendor/lib" }
 
+    -- fmt wbudowany w spdlog wymaga kompilacji źródeł jako UTF-8
+    buildoptions { "/utf-8" }
+
     filter "configurations:Debug"
         defines { "DEBUG" }
         symbols "On"
