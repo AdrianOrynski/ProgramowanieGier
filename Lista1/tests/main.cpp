@@ -1,9 +1,14 @@
-#include <iostream>
+#include <catch_amalgamated.hpp>
 
 #include "engine/Engine.hpp"
 
-int main()
+// Własny main zamiast tego z catch_amalgamated.cpp (CATCH_AMALGAMATED_CUSTOM_MAIN w premake5.lua)
+int main(int argc, char* argv[])
 {
-    std::cout << "Tests linked with " << Engine::GetName() << "\n";
-    return 0;
+    return Catch::Session().run(argc, argv);
+}
+
+TEST_CASE("Engine zwraca swoją nazwę", "[engine]")
+{
+    REQUIRE(std::string(Engine::GetName()) == "Engine");
 }

@@ -54,3 +54,6 @@ project "Tests"
     kind "ConsoleApp"
     files { "tests/**.hpp", "tests/**.cpp" }
     links { "Engine" }
+
+    -- Catch2: main jest w tests/main.cpp, nie w catch_amalgamated.cpp
+    defines { "CATCH_AMALGAMATED_CUSTOM_MAIN" }
