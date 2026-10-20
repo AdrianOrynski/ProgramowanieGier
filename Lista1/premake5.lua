@@ -32,6 +32,9 @@ project "Engine"
     -- LNK4006: duplikaty __NULL_IMPORT_DESCRIPTOR przy scalaniu import-libów, nieszkodliwe
     linkoptions { "/IGNORE:4006" }
 
+    -- imgui-SFML rysuje bezpośrednio przez OpenGL, backend imgui_impl_glfw potrzebuje GLFW (glfw3.dll)
+    links { "opengl32", "glfw3dll" }
+
     -- Engine buduje się przed Game i Tests, więc tu kopiujemy DLL-ki do wspólnego targetdir
     postbuildcommands { '{COPYFILE} "%{wks.location}vendor/bin/*.dll" "%{cfg.targetdir}"' }
 
