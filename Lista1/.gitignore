@@ -5,6 +5,7 @@
 # Pliki generowane przez premake5 / Visual Studio
 .vs/
 *.sln
+*.slnx
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.user
@@ -14,3 +15,6 @@ Makefile
 # Edytory
 .vscode/
 .idea/
+
+# Lokalna kopia premake5 (opcjonalna)
+premake5.exe
