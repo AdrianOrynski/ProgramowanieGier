@@ -1,0 +1,17 @@
+# Wyniki kompilacji
+/bin/
+/bin-int/
+/obj/
+
+# Pliki generowane przez premake5 / Visual Studio
+.vs/
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+Makefile
+*.make
+
+# Edytory
+.vscode/
+.idea/
