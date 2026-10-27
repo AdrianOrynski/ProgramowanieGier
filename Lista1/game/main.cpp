@@ -4,6 +4,7 @@
 #include <spdlog/spdlog.h>
 
 #include "engine/Engine.hpp"
+#include "engine/Game.hpp"
 
 int main()
 {
@@ -16,6 +17,7 @@ int main()
     // Sprawdzenie, czy spdlog jest widoczny
     spdlog::info("spdlog {}.{}.{} dziala", SPDLOG_VER_MAJOR, SPDLOG_VER_MINOR, SPDLOG_VER_PATCH);
 
-    Engine::RunSfmlExample();
+    Engine::CGame game(800, 600, "Game");
+    game.Run();
     return 0;
 }
