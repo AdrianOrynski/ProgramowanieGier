@@ -4,17 +4,16 @@
 
 #include <SFML/Graphics.hpp>
 
+#include "engine/NonCopyable.hpp"
+
 namespace Engine
 {
     // Główna klasa gry - okno SFML, ImGui i pętla gry
-    class CGame
+    class CGame : private NonCopyable
     {
     public:
         CGame(unsigned int width = 800, unsigned int height = 600, const std::string& title = "Game");
         ~CGame();
-
-        CGame(const CGame&) = delete;
-        CGame& operator=(const CGame&) = delete;
 
         // Nieskończona pętla gry - kończy się po zamknięciu okna
         void Run();
