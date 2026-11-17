@@ -67,4 +67,14 @@ namespace Engine::Paths
         return home.empty() ? home : home / ".local" / "share";
 #endif
     }
+
+    std::filesystem::path GetGameDataDirectory()
+    {
+        return GetAppDataDirectory() / "ProgramowanieGier";
+    }
+
+    std::filesystem::path GetLogsDirectory()
+    {
+        return GetGameDataDirectory() / "logs";
+    }
 }

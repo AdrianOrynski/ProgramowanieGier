@@ -1,14 +1,18 @@
 #include <iostream>
 
 #include <nlohmann/json.hpp>
-#include <spdlog/spdlog.h>
 
 #include "engine/Engine.hpp"
 #include "engine/Game.hpp"
+#include "engine/Logger.hpp"
 #include "engine/Paths.hpp"
 
 int main()
 {
+    // Logger jako pierwszy obiekt w main: inicjalizuje się przed wszystkimi systemami
+    // i niszczy jako ostatni (obiekty lokalne są niszczone w odwrotnej kolejności)
+    Engine::CLogger logger;
+
     std::cout << "Game linked with " << Engine::GetName() << "\n";
 
     // Sprawdzenie, czy nlohmann/json jest widoczny
@@ -16,9 +20,9 @@ int main()
     std::cout << "JSON: " << config.dump() << "\n";
 
     // Sprawdzenie, czy spdlog jest widoczny
-    spdlog::info("spdlog {}.{}.{} dziala", SPDLOG_VER_MAJOR, SPDLOG_VER_MINOR, SPDLOG_VER_PATCH);
+    LOG_INFO("spdlog {}.{}.{} dziala", SPDLOG_VER_MAJOR, SPDLOG_VER_MINOR, SPDLOG_VER_PATCH);
 
-    spdlog::info("Katalog AppData: {}", Engine::Paths::GetAppDataDirectory().string());
+    LOG_INFO("Katalog AppData: {}", Engine::Paths::GetAppDataDirectory().string());
 
     Engine::CGame game(800, 600, "Game");
     game.Run();

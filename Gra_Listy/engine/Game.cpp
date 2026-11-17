@@ -1,6 +1,6 @@
 #include "engine/Game.hpp"
 
-#include <spdlog/spdlog.h>
+#include "engine/Logger.hpp"
 
 #include <imgui/imgui.h>
 #include <imgui/SFML/imgui-SFML.h>
@@ -16,16 +16,20 @@ namespace Engine
         m_imguiInitialized = ImGui::SFML::Init(m_window);
         if (!m_imguiInitialized)
         {
-            spdlog::error("Nie udalo sie zainicjalizowac ImGui-SFML");
+            LOG_ERROR("Nie udalo sie zainicjalizowac ImGui-SFML");
             m_window.close();
         }
 
         m_shape.setFillColor(sf::Color::Green);
         m_shape.setPosition({ 300.f, 200.f });
+
+        LOG_INFO("CGame utworzony, okno {}x{} \"{}\"", width, height, title);
     }
 
     CGame::~CGame()
     {
+        LOG_INFO("CGame niszczony po {} klatkach ({:.2f} s)", m_frameTime.frameIndex, m_frameTime.elapsedTime);
+
         if (m_imguiInitialized)
             ImGui::SFML::Shutdown();
     }

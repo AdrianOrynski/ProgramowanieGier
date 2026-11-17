@@ -105,3 +105,41 @@ TEST_CASE("SFrameTime::Update aktualizuje wszystkie pola", "[frametime]")
         REQUIRE_THAT(time.scaledElapsedTime, WithinAbs(0.5, 1e-6));
     }
 }
+
+// --- CLogger (lista 2, zadanie 4) ---
+#include "engine/Logger.hpp"
+
+TEST_CASE("Makra LOG_* działają bez utworzonego CLogger", "[logger]")
+{
+    REQUIRE(Engine::CLogger::Get() != nullptr);
+    REQUIRE(Engine::CLogger::GetLogFilePath().empty());
+
+    LOG_TRACE("trace bez loggera");
+    LOG_INFO("info bez loggera {}", 42);
+    LOG_ERROR("error bez loggera");
+}
+
+TEST_CASE("CLogger zapisuje logi do unikalnego pliku w katalogu logów", "[logger]")
+{
+    std::filesystem::path logFile;
+    {
+        Engine::CLogger logger;
+        logFile = Engine::CLogger::GetLogFilePath();
+
+        REQUIRE_FALSE(logFile.empty());
+        REQUIRE(logFile.parent_path() == Engine::Paths::GetLogsDirectory());
+        REQUIRE(logFile.extension() == ".log");
+
+        LOG_WARN("wiadomosc testowa {}", 123);
+    }
+
+    // Po zniszczeniu loggera plik jest zamknięty i spłukany
+    REQUIRE(Engine::CLogger::GetLogFilePath().empty());
+    REQUIRE(std::filesystem::exists(logFile));
+    REQUIRE(std::filesystem::file_size(logFile) > 0);
+
+    // Makra nadal są bezpieczne po spdlog::shutdown()
+    LOG_INFO("info po zamknieciu loggera");
+
+    std::filesystem::remove(logFile);
+}

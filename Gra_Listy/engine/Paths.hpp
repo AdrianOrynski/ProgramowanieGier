@@ -10,4 +10,10 @@ namespace Engine::Paths
     //     macOS    ~/Library/Application Support
     // Zwraca pustą ścieżkę, jeżeli katalogu nie udało się ustalić.
     std::filesystem::path GetAppDataDirectory();
+
+    // Katalog danych tej gry: <AppData>/ProgramowanieGier
+    std::filesystem::path GetGameDataDirectory();
+
+    // Katalog na pliki logów: <AppData>/ProgramowanieGier/logs
+    std::filesystem::path GetLogsDirectory();
 }
