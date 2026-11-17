@@ -43,10 +43,10 @@ namespace Engine
 
     void CGame::Tick()
     {
-        const sf::Time deltaTime = m_deltaClock.restart();
+        m_frameTime.Update(m_deltaClock.restart().asSeconds());
 
         ProcessEvents();
-        Update(deltaTime);
+        Update();
     }
 
     void CGame::ProcessEvents()
@@ -63,12 +63,31 @@ namespace Engine
             m_window.close();
     }
 
-    void CGame::Update(sf::Time deltaTime)
+    void CGame::Update()
     {
-        ImGui::SFML::Update(m_window, deltaTime);
+        // ImGui dostaje czas rzeczywisty - interfejs nie powinien zwalniać razem z grą
+        ImGui::SFML::Update(m_window, sf::seconds(m_frameTime.deltaTime));
 
         // Okno demo ImGui - sprawdzenie, czy imgui i imgui-sfml działają
         ImGui::ShowDemoWindow();
+
+        DrawFrameTimeWindow();
+    }
+
+    void CGame::DrawFrameTimeWindow()
+    {
+        ImGui::Begin("Frame time");
+
+        ImGui::Text("Frame index:          %llu", static_cast<unsigned long long>(m_frameTime.frameIndex));
+        ImGui::Text("Delta time:           %.4f s (%.1f FPS)", m_frameTime.deltaTime,
+                    m_frameTime.deltaTime > 0.f ? 1.f / m_frameTime.deltaTime : 0.f);
+        ImGui::Text("Elapsed time:         %.2f s", m_frameTime.elapsedTime);
+        ImGui::Separator();
+        ImGui::Text("Scaled delta time:    %.4f s", m_frameTime.scaledDeltaTime);
+        ImGui::Text("Scaled elapsed time:  %.2f s", m_frameTime.scaledElapsedTime);
+        ImGui::SliderFloat("Time scale", &m_frameTime.timeScale, 0.f, 4.f);
+
+        ImGui::End();
     }
 
     void CGame::Render()

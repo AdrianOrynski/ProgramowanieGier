@@ -63,3 +63,45 @@ TEST_CASE("Paths::GetAppDataDirectory zwraca istniejący katalog", "[paths]")
     REQUIRE(appData.is_absolute());
     REQUIRE(std::filesystem::is_directory(appData));
 }
+
+// --- SFrameTime (lista 2, zadanie 3) ---
+#include "engine/FrameTime.hpp"
+
+TEST_CASE("SFrameTime::Update aktualizuje wszystkie pola", "[frametime]")
+{
+    using Catch::Matchers::WithinAbs;
+
+    Engine::SFrameTime time;
+    REQUIRE(time.frameIndex == 0);
+    REQUIRE(time.timeScale == 1.f);
+
+    time.Update(0.5f);
+    REQUIRE(time.frameIndex == 1);
+    REQUIRE_THAT(time.deltaTime, WithinAbs(0.5, 1e-6));
+    REQUIRE_THAT(time.elapsedTime, WithinAbs(0.5, 1e-6));
+    REQUIRE_THAT(time.scaledDeltaTime, WithinAbs(0.5, 1e-6));
+    REQUIRE_THAT(time.scaledElapsedTime, WithinAbs(0.5, 1e-6));
+
+    SECTION("mnożnik czasu wpływa tylko na pola skalowane")
+    {
+        time.timeScale = 2.f;
+        time.Update(0.25f);
+
+        REQUIRE(time.frameIndex == 2);
+        REQUIRE_THAT(time.deltaTime, WithinAbs(0.25, 1e-6));
+        REQUIRE_THAT(time.elapsedTime, WithinAbs(0.75, 1e-6));
+        REQUIRE_THAT(time.scaledDeltaTime, WithinAbs(0.5, 1e-6));
+        REQUIRE_THAT(time.scaledElapsedTime, WithinAbs(1.0, 1e-6));
+    }
+
+    SECTION("pauza (timeScale = 0) zatrzymuje czas skalowany")
+    {
+        time.timeScale = 0.f;
+        time.Update(1.f);
+
+        REQUIRE(time.frameIndex == 2);
+        REQUIRE_THAT(time.elapsedTime, WithinAbs(1.5, 1e-6));
+        REQUIRE_THAT(time.scaledDeltaTime, WithinAbs(0.0, 1e-6));
+        REQUIRE_THAT(time.scaledElapsedTime, WithinAbs(0.5, 1e-6));
+    }
+}
