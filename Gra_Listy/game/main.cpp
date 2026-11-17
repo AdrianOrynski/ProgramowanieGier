@@ -5,6 +5,7 @@
 
 #include "engine/Engine.hpp"
 #include "engine/Game.hpp"
+#include "engine/Paths.hpp"
 
 int main()
 {
@@ -16,6 +17,8 @@ int main()
 
     // Sprawdzenie, czy spdlog jest widoczny
     spdlog::info("spdlog {}.{}.{} dziala", SPDLOG_VER_MAJOR, SPDLOG_VER_MINOR, SPDLOG_VER_PATCH);
+
+    spdlog::info("Katalog AppData: {}", Engine::Paths::GetAppDataDirectory().string());
 
     Engine::CGame game(800, 600, "Game");
     game.Run();

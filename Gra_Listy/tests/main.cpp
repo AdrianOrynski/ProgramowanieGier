@@ -49,3 +49,17 @@ TEST_CASE("NonCopyable usuwa kopiowanie i zostawia przenoszenie", "[noncopyable]
     STATIC_REQUIRE(std::is_move_constructible_v<CWithMacro>);
     STATIC_REQUIRE(std::is_move_assignable_v<CWithMacro>);
 }
+
+// --- Paths (lista 2, zadanie 2) ---
+#include <filesystem>
+
+#include "engine/Paths.hpp"
+
+TEST_CASE("Paths::GetAppDataDirectory zwraca istniejący katalog", "[paths]")
+{
+    const std::filesystem::path appData = Engine::Paths::GetAppDataDirectory();
+
+    REQUIRE_FALSE(appData.empty());
+    REQUIRE(appData.is_absolute());
+    REQUIRE(std::filesystem::is_directory(appData));
+}
