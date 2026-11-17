@@ -1,5 +1,6 @@
 #include "engine/Game.hpp"
 
+#include "engine/Assert.hpp"
 #include "engine/Logger.hpp"
 
 #include <imgui/imgui.h>
@@ -69,6 +70,8 @@ namespace Engine
 
     void CGame::Update()
     {
+        ASSERT(m_frameTime.deltaTime >= 0.f, "Czas klatki nie moze byc ujemny");
+
         // ImGui dostaje czas rzeczywisty - interfejs nie powinien zwalniać razem z grą
         ImGui::SFML::Update(m_window, sf::seconds(m_frameTime.deltaTime));
 
@@ -90,6 +93,13 @@ namespace Engine
         ImGui::Text("Scaled delta time:    %.4f s", m_frameTime.scaledDeltaTime);
         ImGui::Text("Scaled elapsed time:  %.2f s", m_frameTime.scaledElapsedTime);
         ImGui::SliderFloat("Time scale", &m_frameTime.timeScale, 0.f, 4.f);
+
+#if defined(DEBUG)
+        // Ręczne sprawdzenie systemu asercji: log + stos wywołań, breakpoint pod debuggerem, abort
+        ImGui::Separator();
+        if (ImGui::Button("Wywolaj ASSERT"))
+            ASSERT(m_frameTime.frameIndex == 0, "Testowa asercja wywolana z okna ImGui");
+#endif
 
         ImGui::End();
     }

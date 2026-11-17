@@ -143,3 +143,54 @@ TEST_CASE("CLogger zapisuje logi do unikalnego pliku w katalogu logów", "[logge
 
     std::filesystem::remove(logFile);
 }
+
+// --- ASSERT i Callstack (lista 2, zadanie 5) ---
+#include "engine/Assert.hpp"
+#include "engine/Callstack.hpp"
+
+TEST_CASE("ASSERT ze spełnionym warunkiem nie przerywa programu", "[assert]")
+{
+    int evaluations = 0;
+    auto check = [&evaluations] { ++evaluations; return true; };
+
+    ASSERT(check(), "warunek spelniony");
+
+#if defined(DEBUG)
+    REQUIRE(evaluations == 1);  // Debug: warunek wykonany dokładnie raz
+#else
+    REQUIRE(evaluations == 0);  // Release: asercja znika razem z warunkiem
+#endif
+}
+
+TEST_CASE("ASSERT zachowuje się jak pojedyncza instrukcja", "[assert]")
+{
+    // Bez do { } while (false) ten if/else by się nie skompilował albo zmienił znaczenie
+    bool elseTaken = false;
+    if (false)
+        ASSERT(true, "nieosiagalne");
+    else
+        elseTaken = true;
+
+    REQUIRE(elseTaken);
+}
+
+TEST_CASE("CaptureCallstack zwraca symbolizowane ramki", "[callstack]")
+{
+    const std::vector<Engine::SStackFrame> frames = Engine::CaptureCallstack();
+
+#if defined(_WIN32)
+    REQUIRE_FALSE(frames.empty());
+    for (const Engine::SStackFrame& frame : frames)
+    {
+        CHECK(frame.address != 0);
+        CHECK_FALSE(Engine::FormatStackFrame(frame).empty());
+    }
+  #if defined(DEBUG)
+    // W Debug są symbole (.pdb) - pierwsza ramka to ta funkcja testowa, z plikiem i linią
+    CHECK_FALSE(frames.front().function.empty());
+    CHECK(frames.front().file.find("main.cpp") != std::string::npos);
+  #endif
+#else
+    REQUIRE(frames.empty());
+#endif
+}
