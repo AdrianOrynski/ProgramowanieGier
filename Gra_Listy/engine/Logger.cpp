@@ -1,7 +1,5 @@
 #include "engine/Logger.hpp"
 
-#include <chrono>
-#include <ctime>
 #include <string>
 #include <system_error>
 #include <vector>
@@ -22,20 +20,12 @@ namespace Engine
         constexpr const char* LOG_PATTERN = "[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] [%s:%#] %v";
 
         // Unikalna nazwa pliku dla każdego uruchomienia: 2026-11-17_18-52-31.log
-        // (dwukropki są niedozwolone w nazwach plików na Windows)
         std::string MakeLogFileName()
         {
-            const std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-
-            std::tm local{};
-#if defined(_WIN32)
-            localtime_s(&local, &now);
-#else
-            localtime_r(&now, &local);
-#endif
-            char buffer[32];
-            std::strftime(buffer, sizeof(buffer), "%Y-%m-%d_%H-%M-%S.log", &local);
-            return buffer;
+            char timestamp[32];
+            if (Paths::FormatFileTimestamp(timestamp, sizeof(timestamp)) == 0)
+                return "game.log";
+            return std::string(timestamp) + ".log";
         }
     }
 

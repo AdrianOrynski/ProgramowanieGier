@@ -20,6 +20,12 @@ namespace Engine
     // Na Windows korzysta z DbgHelp; na innych platformach zwraca pustą listę.
     std::vector<SStackFrame> CaptureCallstack(unsigned int skipFrames = 0, unsigned int maxFrames = 62);
 
+    // Stos wywołań odtworzony z kontekstu procesora zapisanego w chwili wyjątku
+    // (Windows: wskaźnik na CONTEXT, np. EXCEPTION_POINTERS::ContextRecord).
+    // W przeciwieństwie do CaptureCallstack zaczyna się od instrukcji, która spowodowała
+    // wyjątek, a nie od miejsca wywołania. void*, żeby nagłówek nie zależał od Windows.h.
+    std::vector<SStackFrame> CaptureCallstackFromContext(const void* platformContext, unsigned int maxFrames = 64);
+
     // Ramka w postaci "Funkcja (plik:linia) [0xadres]"
     std::string FormatStackFrame(const SStackFrame& frame);
 }

@@ -20,6 +20,9 @@ workspace "ProgramowanieGier"
     filter "configurations:Release"
         defines { "RELEASE" }
         optimize "On"
+        -- Pliki .pdb także w Release: bez nich stos wywołań w logu i zrzut pamięci
+        -- pokazują tylko adresy zamiast nazw funkcji i numerów linii
+        symbols "On"
 
     filter {}
 

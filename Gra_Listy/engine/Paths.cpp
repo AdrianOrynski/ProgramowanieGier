@@ -1,6 +1,8 @@
 #include "engine/Paths.hpp"
 
+#include <chrono>
 #include <cstdlib>
+#include <ctime>
 
 #if defined(_WIN32)
     #define WIN32_LEAN_AND_MEAN
@@ -76,5 +78,25 @@ namespace Engine::Paths
     std::filesystem::path GetLogsDirectory()
     {
         return GetGameDataDirectory() / "logs";
+    }
+
+    std::filesystem::path GetCrashDumpsDirectory()
+    {
+        return GetGameDataDirectory() / "crashdumps";
+    }
+
+    std::size_t FormatFileTimestamp(char* buffer, std::size_t bufferSize)
+    {
+        const std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+
+        std::tm local{};
+#if defined(_WIN32)
+        if (localtime_s(&local, &now) != 0)
+            return 0;
+#else
+        if (localtime_r(&now, &local) == nullptr)
+            return 0;
+#endif
+        return std::strftime(buffer, bufferSize, "%Y-%m-%d_%H-%M-%S", &local);
     }
 }

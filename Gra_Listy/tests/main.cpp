@@ -194,3 +194,60 @@ TEST_CASE("CaptureCallstack zwraca symbolizowane ramki", "[callstack]")
     REQUIRE(frames.empty());
 #endif
 }
+
+// --- Crash dump: znacznik czasu, katalog, stos z kontekstu (lista 2, zadanie 8) ---
+#include <cstring>
+
+#include "engine/CrashHandler.hpp"
+
+#if defined(_WIN32)
+    #define WIN32_LEAN_AND_MEAN
+    #define NOMINMAX
+    #include <Windows.h>    // RtlCaptureContext
+#endif
+
+TEST_CASE("Paths::FormatFileTimestamp tworzy nazwę bez niedozwolonych znaków", "[paths][crash]")
+{
+    char buffer[32];
+    const std::size_t length = Engine::Paths::FormatFileTimestamp(buffer, sizeof(buffer));
+
+    REQUIRE(length == std::strlen("2026-11-17_18-52-31"));
+    REQUIRE(std::string(buffer).find_first_of(":\\/*?\"<>|") == std::string::npos);
+}
+
+TEST_CASE("Katalog zrzutów leży w katalogu danych gry", "[paths][crash]")
+{
+    REQUIRE(Engine::Paths::GetCrashDumpsDirectory().parent_path() == Engine::Paths::GetGameDataDirectory());
+}
+
+TEST_CASE("CCrashHandler instaluje się i tworzy katalog zrzutów", "[crash]")
+{
+    {
+        Engine::CCrashHandler crashHandler;
+    }
+
+#if defined(_WIN32)
+    REQUIRE(Engine::CCrashHandler::IsSupported());
+    REQUIRE(std::filesystem::is_directory(Engine::Paths::GetCrashDumpsDirectory()));
+#else
+    REQUIRE_FALSE(Engine::CCrashHandler::IsSupported());
+#endif
+}
+
+TEST_CASE("CaptureCallstackFromContext odtwarza stos z kontekstu procesora", "[callstack][crash]")
+{
+    REQUIRE(Engine::CaptureCallstackFromContext(nullptr).empty());
+
+#if defined(_WIN32)
+    CONTEXT context{};
+    RtlCaptureContext(&context);
+
+    const std::vector<Engine::SStackFrame> frames = Engine::CaptureCallstackFromContext(&context);
+    REQUIRE_FALSE(frames.empty());
+
+  #if defined(DEBUG)
+    // Kontekst przechwycony w tej funkcji - pierwsza ramka to ona sama
+    CHECK(frames.front().file.find("main.cpp") != std::string::npos);
+  #endif
+#endif
+}

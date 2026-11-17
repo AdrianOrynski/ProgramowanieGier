@@ -2,6 +2,7 @@
 
 #include <nlohmann/json.hpp>
 
+#include "engine/CrashHandler.hpp"
 #include "engine/Engine.hpp"
 #include "engine/Game.hpp"
 #include "engine/Logger.hpp"
@@ -12,6 +13,9 @@ int main()
     // Logger jako pierwszy obiekt w main: inicjalizuje się przed wszystkimi systemami
     // i niszczy jako ostatni (obiekty lokalne są niszczone w odwrotnej kolejności)
     Engine::CLogger logger;
+
+    // Crash handler zaraz po loggerze (loguje przez niego), przed pozostałymi systemami gry
+    Engine::CCrashHandler crashHandler;
 
     std::cout << "Game linked with " << Engine::GetName() << "\n";
 

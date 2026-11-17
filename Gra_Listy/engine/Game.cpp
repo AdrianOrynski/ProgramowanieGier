@@ -4,8 +4,17 @@
 #include "engine/Logger.hpp"
 #include "engine/WindowEvents.hpp"
 
+#include <stdexcept>
+
 #include <imgui/imgui.h>
 #include <imgui/SFML/imgui-SFML.h>
+
+// Zakaz inline'owania - funkcja zostaje osobną ramką w stosie wywołań także w Release
+#if defined(_MSC_VER)
+    #define ENGINE_NOINLINE __declspec(noinline)
+#else
+    #define ENGINE_NOINLINE __attribute__((noinline))
+#endif
 
 namespace Engine
 {
@@ -23,6 +32,19 @@ namespace Engine
             std::string description;
             float queuedAt;
         };
+
+        ENGINE_NOINLINE void CrashWithAccessViolation()
+        {
+            LOG_WARN("Celowe wywolanie awarii: zapis pod adres nullptr");
+            volatile int* pointer = nullptr;    // volatile - kompilator nie może usunąć zapisu
+            *pointer = 42;
+        }
+
+        ENGINE_NOINLINE void CrashWithCppException()
+        {
+            LOG_WARN("Celowe wywolanie awarii: wyjatek C++ bez catch");
+            throw std::runtime_error("Testowy nieobsluzony wyjatek");
+        }
     }
 
     CGame::CGame(unsigned int width, unsigned int height, const std::string& title)
@@ -196,6 +218,14 @@ namespace Engine
         if (ImGui::Button("Wywolaj ASSERT"))
             ASSERT(m_frameTime.frameIndex == 0, "Testowa asercja wywolana z okna ImGui");
 #endif
+
+        // Celowe awarie do sprawdzenia crash handlera - uruchamiaj BEZ debuggera (Ctrl+F5),
+        // inaczej wyjątek przechwyci Visual Studio, a nie CCrashHandler
+        ImGui::Separator();
+        if (ImGui::Button("Crash: zapis pod nullptr"))
+            CrashWithAccessViolation();
+        if (ImGui::Button("Crash: nieobsluzony wyjatek C++"))
+            CrashWithCppException();
 
         ImGui::End();
     }
